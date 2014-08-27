@@ -89,3 +89,26 @@ func attributesNamesFromPath(path: String) -> (String?, [String]?) {
     }
   }
 }
+
+func removeAttributeWithName(name: String, fromPath path: String) -> String? {
+  
+  if countElements(path) == 0 {
+    
+    return "Path can not be empty"
+  }
+  else if countElements(name) == 0 {
+    
+    return "Attribute name can not be empty"
+  }
+  else {
+    
+    if removexattr(path, name, 0) == -1 {
+      
+      return errnoDescription()
+    }
+    else {
+      
+      return nil
+    }
+  }
+}
