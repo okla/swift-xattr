@@ -50,3 +50,4 @@ println(error!)
 
 > Attribute not found
 ```
+Tested with Xcode 6 beta 6, iOS 8 beta 5 and OSX 10.9.4
