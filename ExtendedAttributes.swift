@@ -1,7 +1,21 @@
 import Foundation
 
+/**
+  Description of current errno state
+
+  :returns: Error description
+*/
 func errnoDescription() -> String { return NSString(UTF8String: strerror(errno)) }
 
+/**
+  Set value for extended attribute
+
+  :param: name Name of extended attribute
+  :param: data Value for extended attribute
+  :param: toPath Path to file, directory, symlink etc
+
+  :returns: In case of success return nil, in case of fail return error description
+*/
 func setAttributeWithName(name: String, #data: NSData, toPath path: String) -> String? {
   
   if countElements(path) == 0 {
@@ -22,6 +36,14 @@ func setAttributeWithName(name: String, #data: NSData, toPath path: String) -> S
   }
 }
 
+/**
+  Get value for extended attribute
+
+  :param: name Name of extended attribute
+  :param: fromPath Path to file, directory, symlink etc
+
+  :returns: Tuple with two parameters. In case of success first parameter is nil, second is extended attribute value. In case of fail first parameter is error description, second is nil.
+*/
 func dataForAttributeWithName(name: String, fromPath path: String) -> (String?, NSData?) {
   
   if countElements(path) == 0 {
@@ -56,6 +78,13 @@ func dataForAttributeWithName(name: String, fromPath path: String) -> (String?, 
   }
 }
 
+/**
+  Get names of extended attributes associated with path
+
+  :param: path Path to file, directory, symlink etc
+
+  :returns: Tuple with two parameters. In case of success first parameter is nil, second is extended attributes names. In case of fail first parameter is error description, second is nil.
+*/
 func attributesNamesFromPath(path: String) -> (String?, [String]?) {
   
   if countElements(path) == 0 {
@@ -90,6 +119,14 @@ func attributesNamesFromPath(path: String) -> (String?, [String]?) {
   }
 }
 
+/**
+  Remove extended attribute
+
+  :param: name Name of extended attribute
+  :param: fromPath Path to file, directory, symlink etc
+
+  :returns: In case of success return nil, in case of fail return error description
+*/
 func removeAttributeWithName(name: String, fromPath path: String) -> String? {
   
   if countElements(path) == 0 {
