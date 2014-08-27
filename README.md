@@ -7,6 +7,10 @@ iOS/OSX Swift language wrappers for Extended File Attributes handling functions 
 Installation
 ============
 
-- Add Objective-C bridging header to your project. Described [here on SO](http://stackoverflow.com/questions/24002369/how-to-call-objective-c-code-from-swift)
-- Add #include <sys/xattr.h> and #include <string.h> string to bridging header
-- Add ExtendedAttributes.swift to your project
+- Add Objective-C bridging header to your project. Described [here](http://stackoverflow.com/questions/24002369/how-to-call-objective-c-code-from-swift).
+- Add strings to your bridging header:
+```
+#include <sys/xattr.h>
+#include <string.h>
+```
+- Add ```ExtendedAttributes.swift``` to your project
