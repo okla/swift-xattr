@@ -32,11 +32,13 @@ func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> S
 */
 func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?, data: NSData?) {
   let bufLength = getxattr(path, name, nil, 0, 0, 0)
+  
   if bufLength == -1 {
     return (errnoDescription(), nil)
   }
   else {
     var buf = malloc(UInt(bufLength))
+    
     if getxattr(path, name, buf, UInt(bufLength), 0, 0) == -1 {
       return (errnoDescription(), nil)
     }
@@ -55,17 +57,20 @@ func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?
 */
 func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
   let bufLength = listxattr(path, nil, 0, 0)
+  
   if bufLength == -1 {
     return (errnoDescription(), nil)
   }
   else {
     var buf = UnsafeMutablePointer<Int8>(malloc(UInt(bufLength)))
+    
     if listxattr(path, buf, UInt(bufLength), 0) == -1 {
       return (errnoDescription(), nil)
     }
     else {
       var names = NSString(bytes: buf, length: bufLength, encoding: NSUTF8StringEncoding).componentsSeparatedByString("\0")
       names.removeLast()
+      
       return (nil, (names as [String]))
     }
   }
