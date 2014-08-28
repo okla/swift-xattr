@@ -5,75 +5,52 @@ import Foundation
 
   :returns: Error description
 */
-func errnoDescription() -> String { return NSString(UTF8String: strerror(errno)) }
-
-/**
-  Set value for extended attribute
-
-  :param: name Name of extended attribute
-  :param: data Value for extended attribute
-  :param: toPath Path to file, directory, symlink etc
-
-  :returns: In case of success return nil, in case of fail return error description
-*/
-func setAttributeWithName(name: String, #data: NSData, toPath path: String) -> String? {
+func errnoDescription() -> String {
   
-  if countElements(path) == 0 {
-   
-    return "Path can not be empty"
-  }
-  else if countElements(name) == 0 {
-   
-    return "Attribute name can not be empty"
-  }
-  else if setxattr(path, name, data.bytes, UInt(data.length), 0, 0) == -1 {
-    
-    return errnoDescription()
-  }
-  else {
-    
-    return nil
-  }
+  return NSString(UTF8String: strerror(errno))
 }
 
 /**
-  Get value for extended attribute
+  Set data for extended attribute at path
 
   :param: name Name of extended attribute
-  :param: fromPath Path to file, directory, symlink etc
+  :param: data Data for extended attribute
+  :param: atPath Path to file, directory, symlink etc
 
-  :returns: Tuple with two parameters. In case of success first parameter is nil, second is extended attribute value. In case of fail first parameter is error description, second is nil.
+  :returns: In case of success return nil, in case of fail return error description
 */
-func dataForAttributeWithName(name: String, fromPath path: String) -> (String?, NSData?) {
+func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> String? {
   
-  if countElements(path) == 0 {
+  return setxattr(path, name, data.bytes, UInt(data.length), 0, 0) == -1 ? errnoDescription() : nil
+}
+
+/**
+  Get data for extended attribute at path
+
+  :param: name Name of extended attribute
+  :param: atPath Path to file, directory, symlink etc
+
+  :returns: Tuple with error description and attribute data. In case of success first parameter is nil, in case of fail second.
+*/
+func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?, data: NSData?) {
+  
+  let bufLength = getxattr(path, name, nil, 0, 0, 0)
     
-    return ("Path can not be empty", nil)
-  }
-  else if countElements(name) == 0 {
+  if bufLength == -1 {
     
-    return ("Attribute name can not be empty", nil)
+    return (errnoDescription(), nil)
   }
   else {
     
-    let bufLength = getxattr(path, name, nil, 0, 0, 0)
-    
-    if bufLength == -1 {
+    var buf = malloc(UInt(bufLength))
       
+    if getxattr(path, name, buf, UInt(bufLength), 0, 0) == -1 {
+        
       return (errnoDescription(), nil)
     }
     else {
-      
-      var buf = malloc(UInt(bufLength))
-      
-      if getxattr(path, name, buf, UInt(bufLength), 0, 0) == -1 {
         
-        return (errnoDescription(), nil)
-      }
-      else {
-        
-        return (nil, NSData(bytes: buf, length: bufLength))
-      }
+      return (nil, NSData(bytes: buf, length: bufLength))
     }
   }
 }
@@ -83,69 +60,44 @@ func dataForAttributeWithName(name: String, fromPath path: String) -> (String?, 
 
   :param: path Path to file, directory, symlink etc
 
-  :returns: Tuple with two parameters. In case of success first parameter is nil, second is extended attributes names. In case of fail first parameter is error description, second is nil.
+  :returns: Tuple with error description and array of extended attributes names. In case of success first parameter is nil, in case of fail second.
 */
-func attributesNamesFromPath(path: String) -> (String?, [String]?) {
-  
-  if countElements(path) == 0 {
+func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
     
-    return ("Path can not be empty", nil)
+  let bufLength = listxattr(path, nil, 0, 0)
+    
+  if bufLength == -1 {
+      
+    return (errnoDescription(), nil)
   }
   else {
-    
-    let bufLength = listxattr(path, nil, 0, 0)
-    
-    if bufLength == -1 {
       
+    var buf = UnsafeMutablePointer<Int8>(malloc(UInt(bufLength)))
+      
+    if listxattr(path, buf, UInt(bufLength), 0) == -1 {
+        
       return (errnoDescription(), nil)
     }
     else {
-      
-      var buf = UnsafeMutablePointer<Int8>(malloc(UInt(bufLength)))
-      
-      if listxattr(path, buf, UInt(bufLength), 0) == -1 {
         
-        return (errnoDescription(), nil)
-      }
-      else {
+      var names = NSString(bytes: buf, length: bufLength, encoding: NSUTF8StringEncoding).componentsSeparatedByString("\0")
         
-        var names = NSString(bytes: buf, length: bufLength, encoding: NSUTF8StringEncoding).componentsSeparatedByString("\0")
+      names.removeLast()
         
-        names.removeLast()
-        
-        return (nil, (names as [String]))
-      }
+      return (nil, (names as [String]))
     }
   }
 }
 
 /**
-  Remove extended attribute
+  Remove extended attribute at path
 
   :param: name Name of extended attribute
-  :param: fromPath Path to file, directory, symlink etc
+  :param: atPath Path to file, directory, symlink etc
 
   :returns: In case of success return nil, in case of fail return error description
 */
-func removeAttributeWithName(name: String, fromPath path: String) -> String? {
-  
-  if countElements(path) == 0 {
+func removeAttributeNamed(name: String, atPath path: String) -> String? {
     
-    return "Path can not be empty"
-  }
-  else if countElements(name) == 0 {
-    
-    return "Attribute name can not be empty"
-  }
-  else {
-    
-    if removexattr(path, name, 0) == -1 {
-      
-      return errnoDescription()
-    }
-    else {
-      
-      return nil
-    }
-  }
+  return removexattr(path, name, 0) == -1 ? errnoDescription() : nil
 }

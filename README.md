@@ -13,40 +13,44 @@
 ```swift
 import Foundation
 
-var (_, names) = attributesNamesFromPath("/file.txt")
-
-for name in names! {
+if let attributesNames = attributesNamesAtPath("/file.txt").names {
   
-  println(name)
+  for name in attributesNames {
+    
+    println(name)
+  }
 }
 
 > com.apple.FinderInfo
 > com.apple.metadata:_kMDItemUserTags
 
-setAttributeWithName("Custom Attribute", data: "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, toPath: "/file.txt")
+setAttributeWithName("Custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, atPath: "/file.txt")
 
-(_, names) = attributesNamesFromPath("/file.txt")
-
-for name in names! {
+if let attributesNames = attributesNamesAtPath("/file.txt").names {
   
-  println(name)
+  for name in attributesNames {
+    
+    println(name)
+  }
 }
 
 > com.apple.FinderInfo
-> Custom Attribute
+> Custom
 > com.apple.metadata:_kMDItemUserTags
 
-var (error, data) = dataForAttributeWithName("Custom Attribute", fromPath: "/file.txt")
-
-println(NSString(data: data!, encoding: NSUTF8StringEncoding))
+if let attributeData = dataForAttributeNamed("Custom", atPath: "/file.txt").data {
+  
+  println(NSString(data: attributeData, encoding: NSUTF8StringEncoding))
+}
 
 > abc
 
-removeAttributeWithName("Custom Attribute", fromPath: "/file.txt")
+removeAttributeNamed("Custom", atPath: "/file.txt")
 
-(error, data) = dataForAttributeWithName("Custom Attribute", fromPath: "/file.txt")
-
-println(error!)
+if let error = dataForAttributeNamed("Custom", atPath: "/file.txt").error {
+  
+  println(error)
+}
 
 > Attribute not found
 ```
