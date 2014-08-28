@@ -14,9 +14,7 @@
 import Foundation
 
 if let attributesNames = attributesNamesAtPath("/file.txt").names {
-  
   for name in attributesNames {
-    
     println(name)
   }
 }
@@ -27,9 +25,7 @@ if let attributesNames = attributesNamesAtPath("/file.txt").names {
 setAttributeWithName("Custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, atPath: "/file.txt")
 
 if let attributesNames = attributesNamesAtPath("/file.txt").names {
-  
   for name in attributesNames {
-    
     println(name)
   }
 }
@@ -39,7 +35,6 @@ if let attributesNames = attributesNamesAtPath("/file.txt").names {
 > com.apple.metadata:_kMDItemUserTags
 
 if let attributeData = dataForAttributeNamed("Custom", atPath: "/file.txt").data {
-  
   println(NSString(data: attributeData, encoding: NSUTF8StringEncoding))
 }
 
@@ -48,7 +43,6 @@ if let attributeData = dataForAttributeNamed("Custom", atPath: "/file.txt").data
 removeAttributeNamed("Custom", atPath: "/file.txt")
 
 if let error = dataForAttributeNamed("Custom", atPath: "/file.txt").error {
-  
   println(error)
 }
 
