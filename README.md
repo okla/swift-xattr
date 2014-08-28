@@ -1,4 +1,4 @@
-###Installation###
+###Installing###
 
 - Add Objective-C bridging header to your project ([howto](http://stackoverflow.com/questions/24002369/how-to-call-objective-c-code-from-swift))
 - Add following lines to bridging header:
@@ -22,7 +22,8 @@ if let attributesNames = attributesNamesAtPath("/file.txt").names {
 > com.apple.FinderInfo
 > com.apple.metadata:_kMDItemUserTags
 
-setAttributeWithName("Custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, atPath: "/file.txt")
+setAttributeWithName("Custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding,
+  allowLossyConversion: false)!, atPath: "/file.txt")
 
 if let attributesNames = attributesNamesAtPath("/file.txt").names {
   for name in attributesNames {
