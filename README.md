@@ -1,52 +1,81 @@
-###Installing###
+###Installation###
 
 - Add Objective-C bridging header to your project ([howto](http://stackoverflow.com/questions/24002369/how-to-call-objective-c-code-from-swift))
-- Add following lines to bridging header:
+- Add following lines to the bridging header:
 ```
 #include <sys/xattr.h>
 #include <string.h>
 ```
 - Add ```ExtendedAttributes.swift``` to your project
 
-###Using###
+###Usage###
 
 ```swift
 import Foundation
 
-if let attributesNames = attributesNamesAtPath("/file.txt").names {
-  for name in attributesNames {
+var errorOrNames = attributesNamesAtPath("/file.txt")
+
+if errorOrNames.names != nil {
+
+  for name in errorOrNames.names! {
+
     println(name)
   }
+}
+else {
+
+  println(errorOrNames.error)
 }
 
 > com.apple.FinderInfo
 > com.apple.metadata:_kMDItemUserTags
 
-setAttributeWithName("Custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding,
-  allowLossyConversion: false)!, atPath: "/file.txt")
+setAttributeWithName("custom", data: "abc".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!, atPath: "/file.txt")
 
-if let attributesNames = attributesNamesAtPath("/file.txt").names {
-  for name in attributesNames {
+errorOrNames = attributesNamesAtPath("/file.txt")
+
+if errorOrNames.names != nil {
+
+  for name in errorOrNames.names! {
+
     println(name)
   }
 }
+else {
+  
+  println(errorOrNames.error)
+}
 
 > com.apple.FinderInfo
-> Custom
+> custom
 > com.apple.metadata:_kMDItemUserTags
 
-if let attributeData = dataForAttributeNamed("Custom", atPath: "/file.txt").data {
-  println(NSString(data: attributeData, encoding: NSUTF8StringEncoding))
+var errorOrData = dataForAttributeNamed("custom", atPath: "/file.txt")
+
+if errorOrData.data != nil {
+
+  println(NSString(data: errorOrData.data!, encoding: NSUTF8StringEncoding))
+}
+else {
+  
+  println(errorOrData.error)
 }
 
 > abc
 
-removeAttributeNamed("Custom", atPath: "/file.txt")
+removeAttributeNamed("custom", atPath: "/file.txt")
+    
+errorOrData = dataForAttributeNamed("custom", atPath: "/file.txt")
 
-if let error = dataForAttributeNamed("Custom", atPath: "/file.txt").error {
-  println(error)
+if errorOrData.data != nil {
+
+  println(NSString(data: errorOrData.data!, encoding: NSUTF8StringEncoding))
+}
+else {
+
+  println(errorOrData.error)
 }
 
 > Attribute not found
 ```
-Tested with Xcode 6 beta 6, iOS 8 beta 5 and OSX 10.9.4
+Tested with Xcode 6.1.1, iOS 8.1 and OSX 10.10
