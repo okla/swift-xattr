@@ -3,7 +3,7 @@ import Foundation
 /** Description of current errno value */
 func errnoDescription() -> String {
 
-  return NSString(UTF8String: strerror(errno))!
+  return (NSString(UTF8String: strerror(errno)) as String?) ?? "\(errno)"
 }
 
 /**
