@@ -78,4 +78,8 @@ else {
 
 > Attribute not found
 ```
-Tested with Xcode 6.1.1, iOS 8.1 and OSX 10.10
+
+To compile in Xcode 6.3 replace errnoDescription() body with following line
+```swift
+return NSString(UTF8String: strerror(errno)) as! String
+```
