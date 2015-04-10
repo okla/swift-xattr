@@ -3,7 +3,7 @@ import Foundation
 /** Description of current errno value */
 func errnoDescription() -> String {
 
-  return NSString(UTF8String: strerror(errno))!
+  return (NSString(UTF8String: strerror(errno)) as String?) ?? "\(errno)"
 }
 
 /**
@@ -17,7 +17,7 @@ func errnoDescription() -> String {
 */
 func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> String? {
 
-  return setxattr(path, name, data.bytes, UInt(data.length), 0, 0) == -1 ? errnoDescription() : nil
+  return setxattr(path, name, data.bytes, data.length, 0, 0) == -1 ? errnoDescription() : nil
 }
 
 /**
@@ -30,7 +30,7 @@ func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> S
 */
 func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?, data: NSData?) {
 
-  let bufLength = getxattr(path, name, nil, 0, 0, 0)
+  let bufLength: Int = getxattr(path, name, nil, 0, 0, 0)
   
   if bufLength == -1 {
 
@@ -38,9 +38,9 @@ func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?
   }
   else {
 
-    var buf = malloc(UInt(bufLength))
+    var buf = malloc(bufLength)
     
-    if getxattr(path, name, buf, UInt(bufLength), 0, 0) == -1 {
+    if getxattr(path, name, buf, bufLength, 0, 0) == -1 {
 
       return (errnoDescription(), nil)
     }
@@ -60,7 +60,7 @@ func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?
 */
 func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
 
-  let bufLength = listxattr(path, nil, 0, 0)
+  let bufLength: Int = listxattr(path, nil, 0, 0)
   
   if bufLength == -1 {
 
@@ -68,9 +68,9 @@ func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
   }
   else {
 
-    var buf = UnsafeMutablePointer<Int8>(malloc(UInt(bufLength)))
+    var buf = UnsafeMutablePointer<Int8>(malloc(bufLength))
     
-    if listxattr(path, buf, UInt(bufLength), 0) == -1 {
+    if listxattr(path, buf, bufLength, 0) == -1 {
 
       return (errnoDescription(), nil)
     }
