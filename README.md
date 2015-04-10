@@ -78,4 +78,4 @@ else {
 
 > Attribute not found
 ```
-Tested with Xcode 6.1.1, iOS 8.1 and OSX 10.10
+Tested with Xcode 6.3 (6D570), iOS 8.1 and OSX 10.10
