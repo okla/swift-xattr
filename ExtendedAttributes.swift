@@ -3,7 +3,7 @@ import Foundation
 /** Description of current errno value */
 func errnoDescription() -> String {
 
-  return NSString(UTF8String: strerror(errno))!
+  return String(UTF8String: strerror(errno))!
 }
 
 /**
@@ -17,7 +17,7 @@ func errnoDescription() -> String {
 */
 func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> String? {
 
-  return setxattr(path, name, data.bytes, UInt(data.length), 0, 0) == -1 ? errnoDescription() : nil
+  return setxattr(path, name, data.bytes, data.length, 0, 0) == -1 ? errnoDescription() : nil
 }
 
 /**
@@ -38,9 +38,9 @@ func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?
   }
   else {
 
-    var buf = malloc(UInt(bufLength))
+    var buf = malloc(bufLength)
     
-    if getxattr(path, name, buf, UInt(bufLength), 0, 0) == -1 {
+    if getxattr(path, name, buf, bufLength, 0, 0) == -1 {
 
       return (errnoDescription(), nil)
     }
@@ -68,19 +68,20 @@ func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
   }
   else {
 
-    var buf = UnsafeMutablePointer<Int8>(malloc(UInt(bufLength)))
+    var buf = UnsafeMutablePointer<Int8>(malloc(bufLength))
     
-    if listxattr(path, buf, UInt(bufLength), 0) == -1 {
+    if listxattr(path, buf, bufLength, 0) == -1 {
 
       return (errnoDescription(), nil)
     }
     else {
 
-      if var names = NSString(bytes: buf, length: bufLength, encoding: NSUTF8StringEncoding)?.componentsSeparatedByString("\0") as? [String] {
+      if var names = NSString(bytes: buf, length: bufLength,
+        encoding: NSUTF8StringEncoding)?.componentsSeparatedByString("\0") as? [String] {
 
-        names.removeLast()
+          names.removeLast()
 
-        return (nil, names)
+          return (nil, names)
       }
       else {
 
