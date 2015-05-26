@@ -15,12 +15,9 @@ import Foundation
 
 var errorOrNames = attributesNamesAtPath("/file.txt")
 
-if errorOrNames.names != nil {
+if let names = errorOrNames.names {
 
-  for name in errorOrNames.names! {
-
-    println(name)
-  }
+  names.map { println($0) }
 }
 else {
 
@@ -34,12 +31,9 @@ setAttributeWithName("custom", data: "abc".dataUsingEncoding(NSUTF8StringEncodin
 
 errorOrNames = attributesNamesAtPath("/file.txt")
 
-if errorOrNames.names != nil {
+if let names = errorOrNames.names {
 
-  for name in errorOrNames.names! {
-
-    println(name)
-  }
+  names.map { println($0) }
 }
 else {
   
@@ -47,14 +41,14 @@ else {
 }
 
 > com.apple.FinderInfo
-> custom
 > com.apple.metadata:_kMDItemUserTags
+> custom
 
 var errorOrData = dataForAttributeNamed("custom", atPath: "/file.txt")
 
-if errorOrData.data != nil {
+if let data = errorOrData.data {
 
-  println(NSString(data: errorOrData.data!, encoding: NSUTF8StringEncoding))
+  println(NSString(data: data, encoding: NSUTF8StringEncoding))
 }
 else {
   
@@ -64,12 +58,12 @@ else {
 > abc
 
 removeAttributeNamed("custom", atPath: "/file.txt")
-    
+
 errorOrData = dataForAttributeNamed("custom", atPath: "/file.txt")
 
-if errorOrData.data != nil {
+if let data = errorOrData.data {
 
-  println(NSString(data: errorOrData.data!, encoding: NSUTF8StringEncoding))
+  println(NSString(data: data, encoding: NSUTF8StringEncoding))
 }
 else {
 
