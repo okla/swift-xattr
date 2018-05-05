@@ -7,7 +7,7 @@
 ### Usage
 
 ```swift
-  import Foundation
+import Foundation
 
 do {
 
