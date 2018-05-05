@@ -1,105 +1,74 @@
 import Foundation
 
-/** Description of current errno value */
-func errnoDescription() -> String {
+struct Xattr {
 
-  return String(UTF8String: strerror(errno))!
-}
+  /** Error type */
+  struct Error: Swift.Error {
 
-/**
-  Set extended attribute at path
-
-  :param: name Name of extended attribute
-  :param: data Data associated with extended attribute
-  :param: atPath Path to file, directory, symlink etc
-
-  :returns: error description if failed, otherwise nil
-*/
-func setAttributeWithName(name: String, #data: NSData, atPath path: String) -> String? {
-
-  return setxattr(path, name, data.bytes, data.length, 0, 0) == -1 ? errnoDescription() : nil
-}
-
-/**
-  Get data for extended attribute at path
-
-  :param: name Name of extended attribute
-  :param: atPath Path to file, directory, symlink etc
-
-  :returns: Tuple with error description and attribute data. In case of success first parameter is nil, otherwise second.
-*/
-func dataForAttributeNamed(name: String, atPath path: String) -> (error: String?, data: NSData?) {
-
-  let bufLength = getxattr(path, name, nil, 0, 0, 0)
-  
-  if bufLength == -1 {
-
-    return (errnoDescription(), nil)
+    let localizedDescription = String(utf8String: strerror(errno))
   }
-  else {
 
-    var buf = malloc(bufLength)
-    
-    if getxattr(path, name, buf, bufLength, 0, 0) == -1 {
+  /**
+    Set extended attribute at path
 
-      return (errnoDescription(), nil)
-    }
-    else {
+    - Parameters:
+      - name: Name of extended attribute
+      - data: Data associated with the attribute
+      - path: Path to file, directory, symlink etc
+  */
+  static func set(named name: String, data: Data, atPath path: String) throws {
 
-      return (nil, NSData(bytes: buf, length: bufLength))
-    }
+    if setxattr(path, name, (data as NSData).bytes, data.count, 0, 0) == -1 { throw Error() }
   }
-}
 
-/**
-  Get names of extended attributes at path
+  /**
+   Remove extended attribute at path
 
-  :param: path Path to file, directory, symlink etc
+   - Parameters:
+     - name: Name of extended attribute
+     - path: Path to file, directory, symlink etc
+   */
+  static func remove(named name: String, atPath path: String) throws {
 
-  :returns: Tuple with error description and array of extended attributes names. In case of success first parameter is nil, otherwise second.
-*/
-func attributesNamesAtPath(path: String) -> (error: String?, names: [String]?) {
-
-  let bufLength = listxattr(path, nil, 0, 0)
-  
-  if bufLength == -1 {
-
-    return (errnoDescription(), nil)
+    if removexattr(path, name, 0) == -1 { throw Error() }
   }
-  else {
 
-    var buf = UnsafeMutablePointer<Int8>(malloc(bufLength))
-    
-    if listxattr(path, buf, bufLength, 0) == -1 {
+  /**
+    Get data for extended attribute at path
 
-      return (errnoDescription(), nil)
-    }
-    else {
+    - Parameters:
+      - name: Name of extended attribute
+      - path: Path to file, directory, symlink etc
+  */
+  static func dataFor(named name: String, atPath path: String) throws -> Data {
 
-      if var names = NSString(bytes: buf, length: bufLength,
-        encoding: NSUTF8StringEncoding)?.componentsSeparatedByString("\0") as? [String] {
+    let bufLength = getxattr(path, name, nil, 0, 0, 0)
 
-          names.removeLast()
+    guard bufLength != -1, let buf = malloc(bufLength), getxattr(path, name, buf, bufLength, 0, 0) != -1 else { throw Error() }
 
-          return (nil, names)
-      }
-      else {
-
-        return ("Unknown error", nil)
-      }
-    }
+    return Data(bytes: buf, count: bufLength)
   }
-}
 
-/**
-  Remove extended attribute at path
+  /**
+    Get names of extended attributes at path
 
-  :param: name Name of extended attribute
-  :param: atPath Path to file, directory, symlink etc
+    - Parameters:
+      - path: Path to file, directory, symlink etc
+  */
+  static func names(atPath path: String) throws -> [String]? {
 
-  :returns: error description if failed, otherwise nil
-*/
-func removeAttributeNamed(name: String, atPath path: String) -> String? {
+    let bufLength = listxattr(path, nil, 0, 0)
 
-  return removexattr(path, name, 0) == -1 ? errnoDescription() : nil
+    guard bufLength != -1 else { throw Error() }
+
+    let buf = UnsafeMutablePointer<Int8>.allocate(capacity: bufLength)
+
+    guard listxattr(path, buf, bufLength, 0) != -1 else { throw Error() }
+
+    var names = NSString(bytes: buf, length: bufLength, encoding: String.Encoding.utf8.rawValue)?.components(separatedBy: "\0")
+
+    names?.removeLast()
+
+    return names
+  }
 }
