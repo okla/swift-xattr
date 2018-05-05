@@ -7,28 +7,28 @@
 ### Usage
 
 ```swift
-import Foundation
+  import Foundation
 
 do {
 
-let customName = "Custom"
-let customPath = "/file.txt"
-let customData = "Custom Data".data(using: .utf8)!
+  let customName = "Custom"
+  let customPath = "/file.txt"
+  let customData = "Custom Data".data(using: .utf8)!
 
-// Setting an attribute
-try Xattr.set(named: customName, data: customData, atPath: customPath)
+  // Setting an attribute
+  try Xattr.set(named: customName, data: customData, atPath: customPath)
 
-// Getting data from an attribute
-let data = try Xattr.dataFor(named: customName, atPath: customPath)
+  // Getting data from an attribute
+  let data = try Xattr.dataFor(named: customName, atPath: customPath)
 
-// Gettings list of attributes
-let names = try Xattr.names(atPath: customPath)
+  // Gettings list of attributes
+  let names = try Xattr.names(atPath: customPath)
 
-// Removing an attribute
-try Xattr.remove(named: customName, atPath: customPath)
+  // Removing an attribute
+  try Xattr.remove(named: customName, atPath: customPath)
 }
 catch {
 
-print(error.localizedDescription)
+  print(error.localizedDescription)
 }
 ```
